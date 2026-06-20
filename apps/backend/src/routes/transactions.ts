@@ -67,7 +67,7 @@ export default async function transactionsRoutes(fastify: FastifyInstance) {
         const description = tx.remittance_information_unstructured || "Sconosciuto";
         const merchant = tx.creditor_name || tx.debtor_name || null;
 
-        const p = await transactionProcessor.processIncomingTransaction({
+        const p = await processor.processIncomingTransaction({
           bankTransactionId: tx.transaction_id || `tx-${Date.now()}-${Math.random()}`,
           date,
           rawDescription: description,
