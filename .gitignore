@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.angular/
+
+# Certificates and private keys
+certs/
+*.pem
+*.key
+
+# Environment variables and local DB
+.env
+*.env.local
+apps/backend/sqlite.db
+apps/backend/sqlite.db-journal
