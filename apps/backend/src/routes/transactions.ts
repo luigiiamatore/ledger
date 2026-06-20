@@ -64,11 +64,14 @@ export default async function transactionsRoutes(fastify: FastifyInstance) {
         const amount = parseFloat(tx.transaction_amount?.amount || "0");
         const currency = tx.transaction_amount?.currency || 'EUR';
         const date = tx.booking_date || new Date().toISOString();
-        const description = tx.remittance_information_unstructured || "Sconosciuto";
-        const merchant = tx.creditor_name || tx.debtor_name || null;
+        const description = (tx.remittance_information && tx.remittance_information[0]) 
+                            || tx.remittance_information_unstructured 
+                            || "Sconosciuto";
+        
+        const merchant = tx.creditor?.name || tx.debtor?.name || null;
 
         const p = await processor.processIncomingTransaction({
-          bankTransactionId: tx.transaction_id || `tx-${Date.now()}-${Math.random()}`,
+          bankTransactionId: tx.entry_reference || tx.transaction_id || `tx-${Date.now()}-${Math.random()}`,
           date,
           rawDescription: description,
           merchantName: merchant,
