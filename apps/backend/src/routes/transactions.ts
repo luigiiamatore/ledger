@@ -58,10 +58,18 @@ export default async function transactionsRoutes(fastify: FastifyInstance) {
       const txData = await bankingService.getAccountTransactions(eurAccount.uid);
       const transactions = txData.transactions || [];
 
-      // Processiamo le prime 5 transazioni (per evitare di esaurire subito la quota Gemini)
+      // Processiamo tutte le transazioni scaricate dal conto
       const processed = [];
-      for (const tx of transactions.slice(0, 5)) {
-        const amount = parseFloat(tx.transaction_amount?.amount || "0");
+      for (const tx of transactions) {
+        let amount = parseFloat(tx.transaction_amount?.amount || "0");
+        
+        // Open Banking API: DBIT = spesa, CRDT = entrata
+        if (tx.credit_debit_indicator === 'DBIT') {
+          amount = -Math.abs(amount);
+        } else {
+          amount = Math.abs(amount);
+        }
+
         const currency = tx.transaction_amount?.currency || 'EUR';
         const date = tx.booking_date || new Date().toISOString();
         const description = (tx.remittance_information && tx.remittance_information[0]) 

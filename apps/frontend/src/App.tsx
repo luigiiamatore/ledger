@@ -113,7 +113,13 @@ function App() {
 
   const totalSpent = transactions
     .filter(t => t.baseAmountEur < 0)
+    .reduce((acc, t) => acc + Math.abs(t.baseAmountEur), 0);
+    
+  const totalIncome = transactions
+    .filter(t => t.baseAmountEur > 0)
     .reduce((acc, t) => acc + t.baseAmountEur, 0);
+
+  const netBalance = totalIncome - totalSpent;
 
   return (
     <div className="app-container">
@@ -138,15 +144,21 @@ function App() {
       <main>
         <div className="dashboard-summary">
           <div className="stat-card glass-panel">
-            <h3>Total Spent (EUR)</h3>
-            <div className="amount text-negative">
-              €{Math.abs(totalSpent).toFixed(2)}
+            <h3>Net Balance</h3>
+            <div className={`amount ${netBalance >= 0 ? 'text-positive' : 'text-negative'}`}>
+              {netBalance >= 0 ? '+' : '-'}€{Math.abs(netBalance).toFixed(2)}
             </div>
           </div>
           <div className="stat-card glass-panel">
-            <h3>Transactions</h3>
-            <div className="amount">
-              {transactions.length}
+            <h3>Income</h3>
+            <div className="amount text-positive">
+              +€{totalIncome.toFixed(2)}
+            </div>
+          </div>
+          <div className="stat-card glass-panel">
+            <h3>Spent</h3>
+            <div className="amount text-negative">
+              -€{totalSpent.toFixed(2)}
             </div>
           </div>
         </div>
@@ -178,8 +190,8 @@ function App() {
                     </div>
                   </div>
                   <div className="tx-right">
-                    <div className="base-amount">
-                      €{tx.baseAmountEur.toFixed(2)}
+                    <div className={`base-amount ${tx.baseAmountEur > 0 ? 'text-positive' : ''}`}>
+                      {tx.baseAmountEur > 0 ? '+' : '-'}€{Math.abs(tx.baseAmountEur).toFixed(2)}
                     </div>
                     {tx.currency !== 'EUR' && (
                       <div className="original-amount">
